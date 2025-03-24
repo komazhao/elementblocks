@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Element Blocks - A Challenging Puzzle Game | Play Online</title>
+    <meta name="description" content="Play Element Blocks online for free. Combine elements, solve puzzles and challenge your brain in this addictive block-matching game.">
+    <link rel="canonical" href="https://elementblocksgame.com/">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --apple-blue: #007AFF;
+            --apple-green: #34C759;
+            --apple-indigo: #5856D6;
+            --apple-orange: #FF9500;
+            --apple-pink: #FF2D55;
+            --apple-purple: #AF52DE;
+            --apple-red: #FF3B30;
+            --apple-teal: #5AC8FA;
+            --apple-yellow: #FFCC00;
+            --apple-gray: #8E8E93;
+            --apple-gray2: #AEAEB2;
+            --apple-gray3: #C7C7CC;
+            --apple-gray4: #D1D1D6;
+            --apple-gray5: #E5E5EA;
+            --apple-gray6: #F2F2F7;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: var(--apple-gray6);
+            color: #333;
+            scroll-behavior: smooth;
+        }
+        .game-container {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border-radius: 12px;
+            overflow: hidden;
+            min-height: 600px; /* 确保游戏容器始终有高度 */
+            position: relative;
+        }
+        .btn-primary {
+            background-color: var(--apple-blue);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #0062cc;
+            transform: translateY(-2px);
+        }
+        .feature-card {
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        @media (max-width: 640px) {
+            .game-iframe {
+                height: 400px !important;
+            }
+            .game-container {
+                min-height: 400px;
+            }
+            .element-blocks-demo {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .element-block {
+                width: 60px;
+                height: 60px;
+                margin: 5px;
+            }
+            .element-block i {
+                font-size: 24px;
+                line-height: 45px;
+            }
+        }
+        .game-demo-bg {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .element-block {
+            display: inline-block;
+            width: 80px;
+            height: 80px;
+            margin: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .element-block:hover {
+            transform: scale(1.1);
+        }
+        .element-water { background-color: var(--apple-blue); }
+        .element-fire { background-color: var(--apple-red); }
+        .element-earth { background-color: var(--apple-green); }
+        .element-air { background-color: var(--apple-teal); }
+        .element-block span {
+            position: absolute;
+            bottom: 5px;
+            left: 0;
+            right: 0;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        .element-block i {
+            font-size: 30px;
+            color: rgba(255,255,255,0.8);
+            line-height: 60px;
+        }
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        /* Mobile menu styles */
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: white;
+            z-index: 50;
+            padding: 1rem;
+            transform: translateX(100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        .mobile-menu.show {
+            transform: translateX(0);
+        }
+        .close-menu {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        /* Back to top button */
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background-color: var(--apple-blue);
+            color: white;
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+            transform: translateY(20px);
+            z-index: 10;
+        }
+        .back-to-top.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <header class="bg-white shadow-md">
+        <div class="container mx-auto px-4 py-6 flex justify-between items-center">
+            <div class="flex items-center">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDdBRkYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cmVjdCB4PSIzIiB5PSIzIiB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHJ4PSIyIiByeT0iMiI+PC9yZWN0PjxsaW5lIHgxPSI5IiB5MT0iMyIgeDI9IjkiIHkyPSIyMSI+PC9saW5lPjxsaW5lIHgxPSIxNSIgeTE9IjMiIHgyPSIxNSIgeTI9IjIxIj48L2xpbmU+PGxpbmUgeDE9IjMiIHkxPSI5IiB4Mj0iMjEiIHkyPSI5Ij48L2xpbmU+PGxpbmUgeDE9IjMiIHkxPSIxNSIgeDI9IjIxIiB5Mj0iMTUiPjwvbGluZT48L3N2Zz4=" alt="Element Blocks Logo" class="w-10 h-10 mr-3">
+                <span class="text-xl font-bold text-gray-800">ElementBlocks</span>
+            </div>
+            <nav class="hidden md:block">
+                <ul class="flex space-x-6">
+                    <li><a href="#" class="text-gray-700 hover:text-blue-500">Home</a></li>
+                    <li><a href="#how-to-play" class="text-gray-700 hover:text-blue-500">How to Play</a></li>
+                    <li><a href="#features" class="text-gray-700 hover:text-blue-500">Features</a></li>
+                </ul>
+            </nav>
+            <button id="menu-toggle" class="md:hidden focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Mobile menu -->
+    <div id="mobile-menu" class="mobile-menu">
+        <button id="close-menu" class="close-menu">&times;</button>
+        <div class="flex flex-col items-center justify-center h-full">
+            <ul class="text-center space-y-8">
+                <li><a href="#" class="text-2xl text-gray-800 font-semibold">Home</a></li>
+                <li><a href="#how-to-play" class="text-2xl text-gray-800 font-semibold">How to Play</a></li>
+                <li><a href="#features" class="text-2xl text-gray-800 font-semibold">Features</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <main class="container mx-auto px-4 py-8">
+        <section class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4 text-gray-800">Element Blocks</h1>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto mb-6">A captivating puzzle game where you combine elements to create new blocks and solve challenging levels.</p>
+            <a href="#" id="play-now-button" class="btn-primary inline-block px-8 py-3 rounded-lg font-semibold mb-4">Play Now</a>
+        </section>
+
+        <section id="game-section" class="mb-16">
+            <div class="game-container bg-white p-4 md:p-6 max-w-4xl mx-auto">
+                <iframe src="https://html5games.com/Game/Element-Blocks/8c70b6c7-5792-4c40-b891-496eef2fb5ed" class="w-full game-iframe" height="600" frameborder="0" allowfullscreen style="display: none;"></iframe>
+                <!-- Fallback content when game fails to load -->
+                <div id="game-fallback" class="p-8 text-center">
+                    <h3 class="text-2xl font-semibold mb-4 text-gray-800">Loading Game...</h3>
+                    <div class="flex justify-center">
+                        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
+                    </div>
+                    <p class="text-gray-600 mb-6">If the game doesn't appear after a while, you can try:</p>
+                    <div class="flex flex-col md:flex-row justify-center gap-4 mb-8">
+                        <a href="javascript:location.reload();" class="btn-primary inline-block px-6 py-2 rounded-lg font-semibold">Refresh Page</a>
+                        <a href="https://html5games.com/Game/Element-Blocks/8c70b6c7-5792-4c40-b891-496eef2fb5ed" target="_blank" class="bg-green-500 hover:bg-green-600 text-white inline-block px-6 py-2 rounded-lg font-semibold">Open in New Window</a>
+                    </div>
+                    
+                    <!-- Game demo area -->
+                    <div class="game-demo-bg mt-8 pulse-animation">
+                        <h4 class="text-white text-xl mb-4">Element Blocks Demo</h4>
+                        <div class="element-blocks-demo">
+                            <div class="element-block element-water"><i>💧</i><span>Water</span></div>
+                            <div class="element-block element-fire"><i>🔥</i><span>Fire</span></div>
+                            <div class="element-block element-earth"><i>🌱</i><span>Earth</span></div>
+                            <div class="element-block element-air"><i>💨</i><span>Air</span></div>
+                        </div>
+                        <p class="text-white mt-4">Combine different elements to create new blocks and solve puzzles!</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="how-to-play" class="mb-16">
+            <h2 class="text-3xl font-bold mb-6 text-center text-gray-800">How to Play</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <div class="text-center mb-4">
+                        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+                            </svg>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2 text-center">Match Elements</h3>
+                    <p class="text-gray-600">Drag and drop elements to match them with similar blocks. Combine elements to create new ones and clear the board.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <div class="text-center mb-4">
+                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2 text-center">Solve Puzzles</h3>
+                    <p class="text-gray-600">Each level presents unique challenges. Think strategically to solve puzzles with the minimum number of moves.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <div class="text-center mb-4">
+                        <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2 text-center">Progress & Unlock</h3>
+                    <p class="text-gray-600">Complete levels to unlock new elements and challenges. Track your progress and aim for the highest score.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="mb-16">
+            <h2 class="text-3xl font-bold mb-8 text-center text-gray-800">Game Features</h2>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="feature-card bg-white p-6 shadow-md">
+                    <h3 class="text-xl font-semibold mb-3 text-gray-800">Engaging Gameplay</h3>
+                    <p class="text-gray-600">Element Blocks offers an addictive gameplay experience that combines puzzle-solving with strategic thinking. The intuitive mechanics make it easy to learn but challenging to master.</p>
+                </div>
+                <div class="feature-card bg-white p-6 shadow-md">
+                    <h3 class="text-xl font-semibold mb-3 text-gray-800">Multiple Levels</h3>
+                    <p class="text-gray-600">With dozens of carefully designed levels, Element Blocks provides hours of entertainment. Each level introduces new challenges and elements to keep the gameplay fresh and exciting.</p>
+                </div>
+                <div class="feature-card bg-white p-6 shadow-md">
+                    <h3 class="text-xl font-semibold mb-3 text-gray-800">Beautiful Graphics</h3>
+                    <p class="text-gray-600">Enjoy vibrant visuals and smooth animations that enhance your gaming experience. The colorful elements and effects make every match satisfying and visually appealing.</p>
+                </div>
+                <div class="feature-card bg-white p-6 shadow-md">
+                    <h3 class="text-xl font-semibold mb-3 text-gray-800">Cross-Platform Play</h3>
+                    <p class="text-gray-600">Play Element Blocks on any device with a web browser. The game is optimized for both desktop and mobile, allowing you to enjoy it wherever you go.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-16">
+            <h2 class="text-3xl font-bold mb-6 text-center text-gray-800">About Element Blocks</h2>
+            <div class="bg-white p-8 rounded-lg shadow-md max-w-3xl mx-auto">
+                <p class="text-gray-600 mb-4">Element Blocks is a captivating puzzle game that challenges players to combine different elements to create new blocks and clear the board. With its intuitive gameplay and increasing difficulty, it offers a perfect balance of casual fun and brain-teasing challenges.</p>
+                <p class="text-gray-600 mb-4">The game draws inspiration from classic match-three puzzles but adds a unique twist with its element combination mechanics. Players must think strategically about each move to optimize their score and complete levels efficiently.</p>
+                <p class="text-gray-600">Whether you're looking for a quick gaming session during your break or a longer puzzle-solving experience, Element Blocks adapts to your playing style and provides endless entertainment.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-8 mt-16">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-6 md:mb-0">
+                    <div class="flex items-center justify-center md:justify-start">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cmVjdCB4PSIzIiB5PSIzIiB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHJ4PSIyIiByeT0iMiI+PC9yZWN0PjxsaW5lIHgxPSI5IiB5MT0iMyIgeDI9IjkiIHkyPSIyMSI+PC9saW5lPjxsaW5lIHgxPSIxNSIgeTE9IjMiIHgyPSIxNSIgeTI9IjIxIj48L2xpbmU+PGxpbmUgeDE9IjMiIHkxPSI5IiB4Mj0iMjEiIHkyPSI5Ij48L2xpbmU+PGxpbmUgeDE9IjMiIHkxPSIxNSIgeDI9IjIxIiB5Mj0iMTUiPjwvbGluZT48L3N2Zz4=" alt="Element Blocks Logo" class="w-8 h-8 mr-3">
+                        <span class="text-lg font-bold">ElementBlocks</span>
+                    </div>
+                    <p class="text-gray-400 mt-2 text-center md:text-left">A challenging puzzle game for all ages</p>
+                </div>
+                <div class="grid grid-cols-2 gap-8 md:gap-16">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3">Links</h3>
+                        <ul class="space-y-2">
+                            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Home</a></li>
+                            <li><a href="#how-to-play" class="text-gray-400 hover:text-white transition-colors">How to Play</a></li>
+                            <li><a href="#features" class="text-gray-400 hover:text-white transition-colors">Features</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3">Legal</h3>
+                        <ul class="space-y-2">
+                            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Privacy Policy</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Terms of Service</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Contact Us</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center">
+                <p class="text-gray-400">&copy; 2023 Element Blocks. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to top button -->
+    <button id="back-to-top" class="back-to-top">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+        </svg>
+    </button>
+</body>
+<script>
+    // Check if iframe loaded successfully
+    window.addEventListener('load', function() {
+        const iframe = document.querySelector('.game-iframe');
+        const fallback = document.getElementById('game-fallback');
+        
+        // Fix Play Now button
+        const playNowButton = document.getElementById('play-now-button');
+        playNowButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Show iframe and hide fallback content
+            fallback.style.display = 'none';
+            iframe.style.display = 'block';
+            
+            // Scroll to game section
+            document.getElementById('game-section').scrollIntoView({
+                behavior: 'smooth'
+            });
+            
+            // Try to reload iframe content
+            iframe.src = iframe.src;
+        });
+        
+        // When iframe is loaded
+        iframe.onload = function() {
+            try {
+                // Try to access iframe content
+                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                
+                // If accessible and has content, show iframe and hide fallback content
+                if (iframeDoc && iframeDoc.body && iframeDoc.body.innerHTML !== '') {
+                    fallback.style.display = 'none';
+                    iframe.style.display = 'block';
+                }
+            } catch (e) {
+                // Cross-domain issue, cannot detect content - try to show iframe
+                console.log('Cannot access iframe content:', e);
+                setTimeout(function() {
+                    // After 3 seconds, try to show iframe anyway
+                    fallback.style.display = 'none';
+                    iframe.style.display = 'block';
+                }, 3000);
+            }
+        };
+        
+        // Set timeout, if still not loaded after 6 seconds, keep showing fallback content
+        setTimeout(function() {
+            if (iframe.style.display === 'none') {
+                // Hide loading animation, update text
+                const loadingText = fallback.querySelector('h3');
+                if (loadingText) loadingText.textContent = 'Game Failed to Load';
+                
+                const spinner = fallback.querySelector('.animate-spin');
+                if (spinner) spinner.style.display = 'none';
+            }
+        }, 6000);
+        
+        // Mobile menu
+        const menuToggle = document.getElementById('menu-toggle');
+        const closeMenu = document.getElementById('close-menu');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileMenuItems = mobileMenu.querySelectorAll('a');
+        
+        menuToggle.addEventListener('click', function() {
+            mobileMenu.classList.add('show');
+        });
+        
+        closeMenu.addEventListener('click', function() {
+            mobileMenu.classList.remove('show');
+        });
+        
+        mobileMenuItems.forEach(item => {
+            item.addEventListener('click', function() {
+                mobileMenu.classList.remove('show');
+            });
+        });
+        
+        // Back to top button
+        const backToTopButton = document.getElementById('back-to-top');
+        
+        window.addEventListener('scroll', function() {
+            if (window.pageYOffset > 300) {
+                backToTopButton.classList.add('show');
+            } else {
+                backToTopButton.classList.remove('show');
+            }
+        });
+        
+        backToTopButton.addEventListener('click', function() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+        
+        // Add interactive effects to element blocks
+        const elementBlocks = document.querySelectorAll('.element-block');
+        
+        elementBlocks.forEach(block => {
+            block.addEventListener('click', function() {
+                this.style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+            });
+        });
+    });
+</script>
+</html>
