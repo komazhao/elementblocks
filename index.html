@@ -89,6 +89,15 @@
             min-height: 600px; /* 确保游戏容器始终有高度 */
             position: relative;
         }
+        /* 动画相关样式简化 */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
         .btn-primary {
             background-color: var(--apple-blue);
             color: white;
@@ -167,14 +176,6 @@
             font-size: 30px;
             color: rgba(255,255,255,0.8);
             line-height: 60px;
-        }
-        .pulse-animation {
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
         }
         /* Mobile menu styles */
         .mobile-menu {
@@ -270,39 +271,7 @@
 
         <section id="game-section" class="mb-16">
             <div class="game-container bg-white p-4 md:p-6 max-w-4xl mx-auto">
-                <iframe src="https://html5games.com/Game/Element-Blocks/8c70b6c7-5792-4c40-b891-496eef2fb5ed" class="w-full game-iframe" height="600" frameborder="0" allowfullscreen style="display: none;"></iframe>
-                <!-- Fallback content when game fails to load -->
-                <div id="game-fallback" class="p-8 text-center">
-                    <h3 class="text-2xl font-semibold mb-4 text-gray-800">Loading Game...</h3>
-                    <div class="flex justify-center">
-                        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
-                    </div>
-                    <p class="text-gray-600 mb-6">If the game doesn't appear after a while, you can try:</p>
-                    <div class="flex flex-col md:flex-row justify-center gap-4 mb-8">
-                        <a href="javascript:location.reload();" class="btn-primary inline-block px-6 py-2 rounded-lg font-semibold">Refresh Page</a>
-                        <a href="https://html5games.com/Game/Element-Blocks/8c70b6c7-5792-4c40-b891-496eef2fb5ed" target="_blank" class="bg-green-500 hover:bg-green-600 text-white inline-block px-6 py-2 rounded-lg font-semibold">Open in New Window</a>
-                    </div>
-                    
-                    <!-- Game demo area -->
-                    <div class="game-demo-bg mt-8 pulse-animation">
-                        <h4 class="text-white text-xl mb-4">Element Blocks Demo</h4>
-                        <div class="element-blocks-demo">
-                            <div class="element-block element-water" aria-label="Water Element Block">
-                                <i aria-hidden="true">💧</i><span>Water</span>
-                            </div>
-                            <div class="element-block element-fire" aria-label="Fire Element Block">
-                                <i aria-hidden="true">🔥</i><span>Fire</span>
-                            </div>
-                            <div class="element-block element-earth" aria-label="Earth Element Block">
-                                <i aria-hidden="true">🌱</i><span>Earth</span>
-                            </div>
-                            <div class="element-block element-air" aria-label="Air Element Block">
-                                <i aria-hidden="true">💨</i><span>Air</span>
-                            </div>
-                        </div>
-                        <p class="text-white mt-4">Combine different elements to create new blocks and solve puzzles!</p>
-                    </div>
-                </div>
+                <iframe src="https://html5games.com/Game/Element-Blocks/8c70b6c7-5792-4c40-b891-496eef2fb5ed" class="w-full game-iframe" height="600" frameborder="0" allowfullscreen></iframe>
             </div>
         </section>
 
@@ -420,64 +389,24 @@
     </button>
 </body>
 <script>
-    // Check if iframe loaded successfully
     window.addEventListener('load', function() {
         const iframe = document.querySelector('.game-iframe');
-        const fallback = document.getElementById('game-fallback');
-        
-        // Fix Play Now button
         const playNowButton = document.getElementById('play-now-button');
+        
+        // 简化的Play Now按钮功能
         playNowButton.addEventListener('click', function(e) {
             e.preventDefault();
             
-            // Show iframe and hide fallback content
-            fallback.style.display = 'none';
-            iframe.style.display = 'block';
-            
-            // Scroll to game section
+            // 滚动到游戏区域
             document.getElementById('game-section').scrollIntoView({
                 behavior: 'smooth'
             });
             
-            // Try to reload iframe content
+            // 刷新iframe内容以确保游戏正常启动
             iframe.src = iframe.src;
         });
         
-        // When iframe is loaded
-        iframe.onload = function() {
-            try {
-                // Try to access iframe content
-                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-                
-                // If accessible and has content, show iframe and hide fallback content
-                if (iframeDoc && iframeDoc.body && iframeDoc.body.innerHTML !== '') {
-                    fallback.style.display = 'none';
-                    iframe.style.display = 'block';
-                }
-            } catch (e) {
-                // Cross-domain issue, cannot detect content - try to show iframe
-                console.log('Cannot access iframe content:', e);
-                setTimeout(function() {
-                    // After 3 seconds, try to show iframe anyway
-                    fallback.style.display = 'none';
-                    iframe.style.display = 'block';
-                }, 3000);
-            }
-        };
-        
-        // Set timeout, if still not loaded after 6 seconds, keep showing fallback content
-        setTimeout(function() {
-            if (iframe.style.display === 'none') {
-                // Hide loading animation, update text
-                const loadingText = fallback.querySelector('h3');
-                if (loadingText) loadingText.textContent = 'Game Failed to Load';
-                
-                const spinner = fallback.querySelector('.animate-spin');
-                if (spinner) spinner.style.display = 'none';
-            }
-        }, 6000);
-        
-        // Mobile menu
+        // 移动菜单
         const menuToggle = document.getElementById('menu-toggle');
         const closeMenu = document.getElementById('close-menu');
         const mobileMenu = document.getElementById('mobile-menu');
@@ -497,7 +426,7 @@
             });
         });
         
-        // Back to top button
+        // 回到顶部按钮
         const backToTopButton = document.getElementById('back-to-top');
         
         window.addEventListener('scroll', function() {
@@ -515,7 +444,7 @@
             });
         });
         
-        // Add interactive effects to element blocks
+        // 元素块交互效果
         const elementBlocks = document.querySelectorAll('.element-block');
         
         elementBlocks.forEach(block => {
